@@ -16,12 +16,20 @@
 	</p>
 
 	<script type="text/javascript" src="/asset/clappr/clappr.min.js"></script>
+	<script type="text/javascript" src="/asset/clappr/level-selector.min.js"></script>
 	<script>
 		var player = new Clappr.Player({
 			source: "https://stream.fosdem.org/{{ room }}.m3u8",
+			plugins: [LevelSelector],
 			baseUrl: "/asset/clappr",
 			parentId: "#player",
 			autoPlay: true,
+
+			levelSelectorConfig: {
+				labelCallback: function(stream, label) {
+					return stream.level.height + 'p';
+				}
+			},
 
 			hlsjsConfig: {
 				xhrSetup: function(xhr, url) {
