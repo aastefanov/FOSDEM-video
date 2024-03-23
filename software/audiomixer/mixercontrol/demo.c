@@ -15,42 +15,35 @@ int main(int argc, char **argv) {
 
     struct mixer_props props = {.port = port, .baud = baud};
 
-    struct mixer_connection *conn;
-    if ((conn = mixer_connect(&props)) == NULL) {
+    struct mixer_connection conn;
+    if (!mixer_connect(&props, &conn)) {
         fprintf(stderr, "cannot connect to mixer\n");
         goto cleanup;
     }
 
-    int bus_count = 6;
-    size_t *channel_counts = malloc(bus_count * sizeof(*channel_counts));
-    for (i = 0; i < bus_count; i++) channel_counts[i] = 6; // all busses have 6 channels
-
-    int t = 0;
-
-    uint8_t **gains = malloc(bus_count * sizeof(*gains));
-    for (i = 0; i < bus_count; i++) {
-        gains[i] = malloc(channel_counts[i] * sizeof(**gains));
-        for (j = 0; j < channel_counts[i]; j++) gains[i][j] = ++t;
+    uint8_t gains[MIXER_BUS_COUNT][MIXER_CHANNEL_COUNT];
+    for (i = 0; i < MIXER_BUS_COUNT; i++) {
+        for (j = 0; j < MIXER_CHANNEL_COUNT; j++) gains[i][j] = i * MIXER_BUS_COUNT + j + 1;
     }
 
     for (i = 0; i < 6; i++)
-        for (j = 0; j < 6; j++) mixer_set_gain(conn, i, j, gains[i][j]);
+        for (j = 0; j < 6; j++) mixer_set_gain(&conn, i, j, gains[i][j]);
 
-    mixer_get_all_gains(conn, gains, 6, channel_counts);
+    mixer_get_all_gains(&conn, gains);
     // if (36 != cnt) {
     // fprintf(stderr, "cannot get all gains, got %d values\n", cnt);
     // goto cleanup;
     // }
 
-    for (i = 0; i < bus_count; i++) {
-        mixer_get_bus_gains(conn, i, gains[i], 6);
-        for (j = 0; j < channel_counts[i]; j++) {
+    for (i = 0; i < MIXER_BUS_COUNT; i++) {
+        mixer_get_bus_gains(&conn, i, gains[i]);
+        for (j = 0; j < MIXER_CHANNEL_COUNT; j++) {
             printf("%d to %d: %d%%\n", i, j, gains[i][j]);
         }
         printf("\n");
     }
 
 cleanup:
-    mixer_disconnect(conn);
+    mixer_disconnect(&conn);
     return 0;
 }

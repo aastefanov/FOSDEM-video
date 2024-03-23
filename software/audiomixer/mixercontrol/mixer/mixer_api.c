@@ -7,19 +7,9 @@
 #include "mixer_cmd.h"
 #include "mixer_api.h"
 
-#define MIXER_BUS_COUNT 6
-#define MIXER_CHANNEL_COUNT 6
+#include "mixer_constants.h"
 
-uint8_t mixer_get_bus_count(const struct mixer_connection *const conn) {
-    return MIXER_BUS_COUNT;
-}
-
-uint8_t mixer_get_channel_count(const struct mixer_connection *const conn,
-                                int bus) {
-    return MIXER_CHANNEL_COUNT;
-}
-
-ssize_t mixer_set_gain(const struct mixer_connection *const conn,
+ssize_t mixer_set_gain(struct mixer_connection *conn,
                        const int bus,
                        const int channel,
                        const uint8_t gain) {
@@ -30,18 +20,17 @@ ssize_t mixer_set_gain(const struct mixer_connection *const conn,
     return bytes;
 }
 
-uint8_t mixer_get_gain(const struct mixer_connection *const conn,
-                       const int bus,
-                       const int channel) {
-    uint8_t *out_gains = malloc(mixer_get_channel_count(conn, bus) * sizeof(*out_gains));
-    mixer_get_bus_gains(conn, bus, out_gains, mixer_get_channel_count(conn, bus));
-    return out_gains[channel];
-}
+// uint8_t mixer_get_gain(const struct mixer_connection *const conn,
+//                        const int bus,
+//                        const int channel) {
+//     uint8_t *out_gains = malloc(mixer_get_channel_count(conn, bus) * sizeof(*out_gains));
+//     mixer_get_bus_gains(conn, bus, out_gains);
+//     return out_gains[channel];
+// }
 
-ssize_t mixer_get_bus_gains(const struct mixer_connection *const conn,
-                            const int bus,
-                            uint8_t *out_gains,
-                            const size_t out_gains_length) {
+ssize_t mixer_get_bus_gains(struct mixer_connection *conn,
+                            int bus,
+                            uint8_t out_gains[MIXER_CHANNEL_COUNT]) {
     if (out_gains == NULL) return -1;
 
     // TODO: Change firmware so it doesn't write on set_gain, so flushing isn't needed,
@@ -65,7 +54,7 @@ ssize_t mixer_get_bus_gains(const struct mixer_connection *const conn,
 
     const char *token = strtok(temp, " ");
 
-    while (token != NULL && i < out_gains_length) {
+    while (token != NULL && i < MIXER_CHANNEL_COUNT) {
         out_gains[i++] = atoi(token);
         token = strtok(NULL, " ");
     }
@@ -73,17 +62,16 @@ ssize_t mixer_get_bus_gains(const struct mixer_connection *const conn,
     return i;
 }
 
-ssize_t mixer_get_all_gains(const struct mixer_connection *const conn,
-                            uint8_t **out_gains,
-                            const size_t out_gains_length, const size_t *out_gains_channel_lengths) {
+ssize_t mixer_get_all_gains(struct mixer_connection *conn,
+                            uint8_t out_gains[MIXER_BUS_COUNT][MIXER_CHANNEL_COUNT]) {
     if (out_gains == NULL) return -1;
 
     int i;
     int count = 0;
     int gains;
 
-    for (i = 0; i < out_gains_length && i < mixer_get_bus_count(conn); i++) {
-        gains = mixer_get_bus_gains(conn, i, out_gains[i], out_gains_channel_lengths[i]);
+    for (i = 0; i < MIXER_BUS_COUNT; i++) {
+        gains = mixer_get_bus_gains(conn, i, out_gains[i]);
         if (gains < 0) return count; // cannot read all channels
         count += gains;
     }

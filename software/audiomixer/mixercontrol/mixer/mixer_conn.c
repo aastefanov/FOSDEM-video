@@ -6,35 +6,8 @@
 
 #include "mixer_conn.h"
 
-void mixer_cleanup_connection(struct mixer_connection *conn) {
-    if (conn == NULL) return;
-
-    close(conn->fd);
-    free(conn->write_buffer);
-    free(conn->read_buffer);
-
-    free(conn);
-}
-
-struct mixer_connection *mixer_allocate_connection() {
-    struct mixer_connection *conn = malloc(sizeof(*conn));
-    if (conn == NULL) goto cleanup;
-
-    conn->read_buffer = malloc(MIXER_READ_SIZE * sizeof(*conn->read_buffer));
-    if (conn->read_buffer == NULL) goto cleanup;
-
-    conn->write_buffer = malloc(MIXER_READ_SIZE * sizeof(*conn->write_buffer));
-    if (conn->write_buffer == NULL) goto cleanup;
-
-    return conn;
-
-cleanup:
-    mixer_cleanup_connection(conn);
-    return NULL;
-}
-
-struct mixer_connection *mixer_connect(const struct mixer_props *const mixer) {
-    struct mixer_connection *conn = mixer_allocate_connection();
+struct mixer_connection *mixer_connect(const struct mixer_props *const mixer,
+                                       struct mixer_connection *const conn) {
     conn->fd = open(mixer->port, O_RDWR | O_NOCTTY);
     if (conn->fd < 0) goto cleanup;
 
@@ -68,10 +41,10 @@ struct mixer_connection *mixer_connect(const struct mixer_props *const mixer) {
 
     return conn;
 cleanup:
-    mixer_cleanup_connection(conn);
+    mixer_disconnect(conn);
     return NULL;
 }
 
-void mixer_disconnect(struct mixer_connection *conn) {
-    mixer_cleanup_connection(conn);
+void mixer_disconnect(const struct mixer_connection *conn) {
+    close(conn->fd);
 }

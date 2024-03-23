@@ -1,8 +1,7 @@
 #ifndef _MIXER_CONN_H_
 #define _MIXER_CONN_H_
 
-#define MIXER_READ_SIZE 1024
-#define MIXER_WRITE_SIZE 1024
+#include "mixer_constants.h"
 
 struct mixer_props {
     char *port;
@@ -11,12 +10,12 @@ struct mixer_props {
 
 struct mixer_connection {
     int fd;
-    char *read_buffer;
-    char *write_buffer;
+    char read_buffer[MIXER_READ_SIZE];
+    char write_buffer[MIXER_WRITE_SIZE];
 };
 
-struct mixer_connection *mixer_connect(const struct mixer_props *);
+struct mixer_connection *mixer_connect(const struct mixer_props *, struct mixer_connection *);
 
-void mixer_disconnect(struct mixer_connection *);
+void mixer_disconnect(const struct mixer_connection *);
 
 #endif // _MIXER_CONN_H_

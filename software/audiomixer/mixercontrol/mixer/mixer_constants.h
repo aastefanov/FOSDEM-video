@@ -1,0 +1,10 @@
+#ifndef _MIXER_CONSTS_H_
+#define _MIXER_CONSTS_H_
+
+#define MIXER_READ_SIZE 1024
+#define MIXER_WRITE_SIZE 1024
+
+#define MIXER_BUS_COUNT 6
+#define MIXER_CHANNEL_COUNT 6
+
+#endif // _MIXER_CONSTS_H_
