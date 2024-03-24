@@ -13,7 +13,7 @@ ssize_t mixer_set_gain(struct mixer_connection *conn,
                        const int bus,
                        const int channel,
                        const uint8_t gain) {
-    int bytes = snprintf(conn->write_buffer, MIXER_WRITE_SIZE, "s%d%d%d\n", bus + 1, channel + 1, gain);
+    int bytes = snprintf(conn->write_buffer, MIXER_WRITE_SIZE, "s%d%d%d\r", bus + 1, channel + 1, gain);
     if (bytes != mixer_write(conn, conn->write_buffer, bytes)) return -1;
 
     mixer_read(conn, conn->read_buffer, MIXER_READ_SIZE);
@@ -37,7 +37,7 @@ ssize_t mixer_get_bus_gains(struct mixer_connection *conn,
     // or just return size_t of the response there?
     mixer_flush_buffers(conn, conn->read_buffer, MIXER_READ_SIZE);
 
-    int bytes = snprintf(conn->write_buffer, MIXER_WRITE_SIZE, "l%d\r\n", bus + 1);
+    int bytes = snprintf(conn->write_buffer, MIXER_WRITE_SIZE, "l%d\r", bus + 1);
 
     if (bytes != mixer_write(conn, conn->write_buffer, bytes)) return -1;
 
