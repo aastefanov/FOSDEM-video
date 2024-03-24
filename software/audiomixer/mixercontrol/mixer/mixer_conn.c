@@ -8,52 +8,51 @@
 
 // sadly, we have to keep a mapping table, as the termios.h constants
 // are actually different than the integers
-speed_t get_baud(int baud)
-{
+speed_t get_baud(int baud) {
     switch (baud) {
-    case 9600:
-        return B9600;
-    case 19200:
-        return B19200;
-    case 38400:
-        return B38400;
-    case 57600:
-        return B57600;
-    case 115200:
-        return B115200;
-    case 230400:
-        return B230400;
-    case 460800:
-        return B460800;
-    case 500000:
-        return B500000;
-    case 576000:
-        return B576000;
-    case 921600:
-        return B921600;
-    case 1000000:
-        return B1000000;
-    case 1152000:
-        return B1152000;
-    case 1500000:
-        return B1500000;
-    case 2000000:
-        return B2000000;
-    case 2500000:
-        return B2500000;
-    case 3000000:
-        return B3000000;
-    case 3500000:
-        return B3500000;
-    case 4000000:
-        return B4000000;
-    default:
-        return B9600;
+        case 9600:
+            return B9600;
+        case 19200:
+            return B19200;
+        case 38400:
+            return B38400;
+        case 57600:
+            return B57600;
+        case 115200:
+            return B115200;
+        case 230400:
+            return B230400;
+        case 460800:
+            return B460800;
+        case 500000:
+            return B500000;
+        case 576000:
+            return B576000;
+        case 921600:
+            return B921600;
+        case 1000000:
+            return B1000000;
+        case 1152000:
+            return B1152000;
+        case 1500000:
+            return B1500000;
+        case 2000000:
+            return B2000000;
+        case 2500000:
+            return B2500000;
+        case 3000000:
+            return B3000000;
+        case 3500000:
+            return B3500000;
+        case 4000000:
+            return B4000000;
+        default:
+            return B9600;
     }
 }
 
-struct mixer_connection *mixer_connect(const struct mixer_props *const mixer,
-                                       struct mixer_connection *const conn) {
+ssize_t *mixer_connect(const struct mixer_props *const mixer,
+                       struct mixer_connection *const conn) {
     conn->fd = open(mixer->port, O_RDWR | O_NOCTTY | O_NONBLOCK);
     if (conn->fd < 0) goto cleanup;
 
@@ -84,14 +83,15 @@ struct mixer_connection *mixer_connect(const struct mixer_props *const mixer,
 
     if (tcsetattr(conn->fd, TCSANOW, &tty) != 0) goto cleanup;
 
-    return conn;
+    return 0;
+
 cleanup:
     mixer_disconnect(conn);
-    return NULL;
+    return -1;
 }
 
 void mixer_disconnect(const struct mixer_connection *conn) {
-    if(conn->fd < 0) return;
+    if (conn->fd < 0) return;
     tcsetattr(conn->fd, TCSANOW, &conn->original_tty);
     close(conn->fd);
 }
