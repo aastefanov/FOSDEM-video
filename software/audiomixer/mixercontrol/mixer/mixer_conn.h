@@ -38,7 +38,7 @@ struct mixer_connection {
  * @sa mixer_disconnect
  * @return Zero on success, -1 on error
  */
-ssize_t *mixer_connect(const struct mixer_props *params, struct mixer_connection *conn);
+ssize_t mixer_connect(const struct mixer_props *params, struct mixer_connection *conn);
 
 /**
  * Close an established connection
