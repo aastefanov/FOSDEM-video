@@ -163,8 +163,17 @@ do_cmd()
 void
 do_uart()
 {
-	std::getline(std::cin, cmdbuffer);
-	if(cmdbuffer.empty()) cmdbuffer = "\r";
+	char c;
+	while (std::cin.get(c)) {
+		cmdbuffer += c;
+		if(c == '\r') {
+			do_cmd();
+			cmdbuffer = "";
+		}
+
+	}
+//	std::getline(std::cin, cmdbuffer);
+//	if(cmdbuffer.empty()) cmdbuffer = "\r";
 
 	// note: input is buffered, so echo WILL wait for the line to be completed
 	if(echo) std::cout << cmdbuffer << std::endl; // flush!!
