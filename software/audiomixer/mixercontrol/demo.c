@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     struct mixer_props props = {.port = port, .baud = baud};
 
     struct mixer_connection conn;
-    if (!mixer_connect(&props, &conn)) {
+    if (mixer_connect(&props, &conn) < 0) {
         fprintf(stderr, "cannot connect to mixer\n");
         goto cleanup;
     }

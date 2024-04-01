@@ -33,6 +33,8 @@ ssize_t mixer_get_bus_gains(struct mixer_connection *conn,
                             uint8_t out_gains[MIXER_CHANNEL_COUNT]) {
     if (out_gains == NULL) return -1;
 
+    if(bus < 0 || bus >= MIXER_BUS_COUNT) return -1;
+
     // TODO: Change firmware so it doesn't write on set_gain, so flushing isn't needed,
     // or just return size_t of the response there?
     mixer_flush_buffers(conn, conn->read_buffer, MIXER_READ_SIZE);
