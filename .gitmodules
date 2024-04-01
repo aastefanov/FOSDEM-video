@@ -1,0 +1,3 @@
+[submodule "software/audiomixer/mixercontrol/mongoose"]
+	path = software/audiomixer/mixercontrol/mongoose
+	url = https://github.com/cesanta/mongoose
