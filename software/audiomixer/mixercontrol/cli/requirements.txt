@@ -1,0 +1,9 @@
+click
+click-shell
+
+tabulate
+
+pyserial
+python-osc
+
+auto-click-auto
