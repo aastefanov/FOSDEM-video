@@ -10,16 +10,8 @@ Level = float
 
 
 class OSCController:
-    # inputs = ['IN1', 'IN2', 'IN3', 'PC', 'USB1', 'USB2']
-    # outputs = ['OUT1', 'OUT2', 'HP1', 'HP2', 'USB1', 'USB2']
-
-    @property
-    def inputs(self):
-        return ['IN1', 'IN2', 'IN3', 'PC', 'USB1', 'USB2']
-
-    @property
-    def outputs(self):
-        return ['OUT1', 'OUT2', 'HP1', 'HP2', 'USB1', 'USB2']
+    inputs = ['IN1', 'IN2', 'IN3', 'PC', 'USB1', 'USB2']
+    outputs = ['OUT1', 'OUT2', 'HP1', 'HP2', 'USB1', 'USB2']
 
     @property
     def device(self) -> str:
@@ -46,4 +38,4 @@ class OSCController:
         message.add_arg(Level(level))
         self.client.send(message.build())
 
-        # assert abs(self.get_gain(channel, bus) - level) < 0.01  # up to 1% error
+        assert abs(self.get_gain(channel, bus) - level) < 0.01  # up to 1% error

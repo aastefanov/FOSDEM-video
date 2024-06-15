@@ -1,9 +1,7 @@
 click
-click-shell
+click-repl
 
 tabulate
 
 pyserial
 python-osc
-
-auto-click-auto
